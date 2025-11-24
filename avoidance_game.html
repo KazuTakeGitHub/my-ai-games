@@ -237,6 +237,7 @@
         ctx.font = '20px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('スタートボタンを押してください', canvas.width / 2, canvas.height / 2);
+        
 const backToMenuButton = document.getElementById('backToMenu');
         backToMenuButton.addEventListener('click', () => {
             if (typeof cancelAnimationFrame !== 'undefined' && animationFrameId) {
@@ -244,20 +245,11 @@ const backToMenuButton = document.getElementById('backToMenu');
                 window.location.href = 'index.html'; 
         });
     </script>
-    // --- Canvasゲーム用のメニュー遷移ロジック ---
-        const backToMenuButton = document.getElementById('backToMenu');
-        backToMenuButton.addEventListener('click', () => {
-            // ① アニメーションループを停止
-            if (typeof cancelAnimationFrame !== 'undefined' && animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
-            }
-            // ② index.htmlへ遷移
-            window.location.href = 'index.html'; 
-        });
-        // ------------------------------------------
+
 </body>
 
 </html>
+
 
 
 

@@ -5,8 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI作 〇×ゲーム</title>
     <style>
-        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background-color: #f0f0f5; color: #333; }
-        .game-container { background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
+        body { 
+            font-family: sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            background-color: #f0f0f5; 
+            color: #333; 
+        }
+        .game-container { 
+            background-color: #fff; 
+            padding: 20px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+            margin-bottom: 20px; /* メニューボタンとのスペースを確保 */
+        }
         h1 { color: #007bff; }
         #board {
             display: grid;
@@ -28,8 +41,8 @@
         .cell:hover {
             background-color: #dee2e6;
         }
-        .cell.X { color: #dc3545; } /* 赤 */
-        .cell.O { color: #007bff; } /* 青 */
+        .cell.X { color: #dc3545; } /* 赤 (〇) */
+        .cell.O { color: #007bff; } /* 青 (×) */
         #message { margin-top: 20px; font-size: 1.2em; font-weight: bold; }
         #resetButton {
             margin-top: 20px;
@@ -40,6 +53,29 @@
             color: white;
             border: none;
             border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+        #resetButton:hover {
+            background-color: #5a6268;
+        }
+        /* --- メニューボタンの汎用スタイル (追加) --- */
+        #backToMenu {
+            position: fixed; /* 画面に固定 */
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: #6c757d; /* グレー系 */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: background-color 0.2s;
+        }
+        #backToMenu:hover {
+            background-color: #5a6268;
         }
     </style>
 </head>
@@ -52,10 +88,13 @@
         <button id="resetButton">リセットしてもう一度遊ぶ</button>
     </div>
 
+    <button id="backToMenu">🏡 メインメニューに戻る</button> 
+
     <script>
         const board = document.getElementById('board');
         const messageDisplay = document.getElementById('message');
         const resetButton = document.getElementById('resetButton');
+        const backToMenuButton = document.getElementById('backToMenu'); // メニューボタンを取得
         let gameBoard = ['', '', '', '', '', '', '', '', ''];
         let isGameActive = true;
         const player = 'X'; // プレイヤーは 'X' (〇)
@@ -122,39 +161,3 @@
 
                 if (checkDraw()) {
                     messageDisplay.textContent = '引き分けです！';
-                    isGameActive = false;
-                    return;
-                }
-
-                messageDisplay.textContent = 'あなたのターンです (〇)';
-            }
-        }
-
-        function updateCell(index, marker) {
-            const cellElement = board.querySelector(`[data-index="${index}"]`);
-            cellElement.textContent = marker === 'X' ? '〇' : '×';
-            cellElement.classList.add(marker);
-        }
-
-        function checkWin(marker) {
-            return winningCombinations.some(combination => {
-                return combination.every(index => {
-                    return gameBoard[index] === marker;
-                });
-            });
-        }
-
-        function checkDraw() {
-            return gameBoard.every(cell => cell !== '');
-        }
-
-        resetButton.addEventListener('click', () => {
-            gameBoard = ['', '', '', '', '', '', '', '', ''];
-            createBoard();
-        });
-
-        // 最初のボード作成
-        createBoard();
-    </script>
-</body>
-</html>

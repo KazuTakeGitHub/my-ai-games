@@ -14,6 +14,7 @@
             background-color: #f4f7f6;
             color: #333;
             margin: 0;
+            flex-direction: column; /* メニューボタン配置のため */
         }
         .game-container {
             background-color: #fff;
@@ -90,6 +91,25 @@
         .reset-button:hover {
             background-color: #5a6268;
         }
+        /* --- メニューボタンの汎用スタイル (追加) --- */
+        #backToMenu {
+            position: fixed; /* 画面に固定 */
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: #6c757d; /* グレー系 */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: background-color 0.2s;
+        }
+        #backToMenu:hover {
+            background-color: #5a6268;
+        }
     </style>
 </head>
 <body>
@@ -105,6 +125,8 @@
         <p id="previousGuesses"></p>
     </div>
 
+    <button id="backToMenu">🏡 メインメニューに戻る</button> 
+
     <script>
         let randomNumber = Math.floor(Math.random() * 100) + 1;
         let guessCount = 0;
@@ -117,6 +139,7 @@
         const messageDisplay = document.getElementById('message');
         const remainingGuessesDisplay = document.getElementById('remainingGuesses');
         const previousGuessesDisplay = document.getElementById('previousGuesses');
+        const backToMenuButton = document.getElementById('backToMenu'); // メニューボタンを取得
 
         submitButton.addEventListener('click', checkGuess);
         resetButton.addEventListener('click', resetGame);
@@ -179,6 +202,13 @@
             guessInput.value = '';
             guessInput.focus();
         }
+
+        // --- メニュー遷移ロジックの追加 ---
+        backToMenuButton.addEventListener('click', () => {
+            // ゲームにタイマーやアニメーションループがないため、そのまま遷移
+            window.location.href = 'index.html'; 
+        });
     </script>
 </body>
+
 </html>

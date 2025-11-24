@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI作 じゃんけんゲーム</title>
+    <style>
+        body { font-family: 'Hiragino Sans', 'Meiryo', sans-serif; display: flex; flex-direction: column; align-items: center; background-color: #ffe0b2; padding: 20px; }
+        .game-box { background-color: #fff; padding: 30px; border-radius: 15px; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); max-width: 400px; width: 90%; text-align: center; }
+        h1 { color: #ff9800; font-size: 2.5em; margin-bottom: 20px; }
+        #buttons { display: flex; justify-content: space-around; margin-bottom: 30px; }
+        .janken-btn {
+            padding: 15px;
+            font-size: 3em;
+            cursor: pointer;
+            background: none;
+            border: 3px solid #ff9800;
+            border-radius: 10px;
+            transition: transform 0.1s, background-color 0.2s;
+        }
+        .janken-btn:hover {
+            transform: scale(1.1);
+            background-color: #fff3e0;
+        }
+        #result-area {
+            min-height: 100px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        #result { font-size: 1.5em; font-weight: bold; color: #333; }
+        #computer-choice { font-size: 1.5em; margin-top: 10px; color: #ff5722; }
+        #score-board { font-size: 1.1em; color: #555; }
+        #resetButton {
+            padding: 8px 15px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-box">
+        <h1>AI作 じゃんけんゲーム</h1>
+        <p>グー・チョキ・パーを選んでコンピュータに勝とう！</p>
+
+        <div id="buttons">
+            <button class="janken-btn" data-hand="rock">✊</button>
+            <button class="janken-btn" data-hand="scissors">✌️</button>
+            <button class="janken-btn" data-hand="paper">🖐️</button>
+        </div>
+
+        <div id="result-area">
+            <div id="result">じゃんけん...</div>
+            <div id="computer-choice"></div>
+        </div>
+        
+        <p id="score-board">
+            勝: <span id="wins">0</span> / 負: <span id="losses">0</span> / 引分: <span id="draws">0</span>
+        </p>
+        <button id="resetButton">スコアをリセット</button>
+    </div>
+
+    <script>
+        const hands = ['rock', 'scissors', 'paper']; // グー、チョキ、パー
+        const handEmojis = { 'rock': '✊', 'scissors': '✌️', 'paper': '🖐️' };
+        
+        let scores = { wins: 0, losses: 0, draws: 0 };
+
+        const resultDisplay = document.getElementById('result');
+        const computerChoiceDisplay = document.getElementById('computer-choice');
+        const winsDisplay = document.getElementById('wins');
+        const lossesDisplay = document.getElementById('losses');
+        const drawsDisplay = document.getElementById('draws');
+        const buttons = document.querySelectorAll('.janken-btn');
+        const resetButton = document.getElementById('resetButton');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                playGame(button.dataset.hand);
+            });
+        });
+
+        resetButton.addEventListener('click', resetScore);
+
+        function getComputerChoice() {
+            const randomIndex = Math.floor(Math.random() * hands.length);
+            return hands[randomIndex];
+        }
+
+        function determineWinner(userChoice, computerChoice) {
+            if (userChoice === computerChoice) {
+                return 'draw';
+            }
+            if (
+                (userChoice === 'rock' && computerChoice === 'scissors') ||
+                (userChoice === 'scissors' && computerChoice === 'paper') ||
+                (userChoice === 'paper' && computerChoice === 'rock')
+            ) {
+                return 'win';
+            }
+            return 'loss';
+        }
+
+        function updateScore(result) {
+            if (result === 'win') {
+                scores.wins++;
+                resultDisplay.textContent = 'あなたの勝ち！🥳';
+                resultDisplay.style.color = '#28a745';
+            } else if (result === 'loss') {
+                scores.losses++;
+                resultDisplay.textContent = 'コンピュータの勝ち...😭';
+                resultDisplay.style.color = '#dc3545';
+            } else {
+                scores.draws++;
+                resultDisplay.textContent = '引き分けです。🤝';
+                resultDisplay.style.color = '#ff9800';
+            }
+            
+            winsDisplay.textContent = scores.wins;
+            lossesDisplay.textContent = scores.losses;
+            drawsDisplay.textContent = scores.draws;
+        }
+
+        function playGame(userChoice) {
+            const computerChoice = getComputerChoice();
+            
+            computerChoiceDisplay.textContent = `コンピュータの出した手: ${handEmojis[computerChoice]}`;
+            
+            const result = determineWinner(userChoice, computerChoice);
+            updateScore(result);
+        }
+
+        function resetScore() {
+            scores = { wins: 0, losses: 0, draws: 0 };
+            winsDisplay.textContent = 0;
+            lossesDisplay.textContent = 0;
+            drawsDisplay.textContent = 0;
+            resultDisplay.textContent = 'じゃんけん...';
+            resultDisplay.style.color = '#333';
+            computerChoiceDisplay.textContent = '';
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI作 〇×ゲーム</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background-color: #f0f0f5; color: #333; }
+        .game-container { background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
+        h1 { color: #007bff; }
+        #board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            margin-top: 20px;
+        }
+        .cell {
+            background-color: #e9ecef;
+            border: 2px solid #adb5bd;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3em;
+            cursor: pointer;
+            transition: background-color 0.1s;
+        }
+        .cell:hover {
+            background-color: #dee2e6;
+        }
+        .cell.X { color: #dc3545; } /* 赤 */
+        .cell.O { color: #007bff; } /* 青 */
+        #message { margin-top: 20px; font-size: 1.2em; font-weight: bold; }
+        #resetButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>AI作 〇×ゲーム</h1>
+        <div id="board">
+            </div>
+        <p id="message">あなたのターンです (〇)</p>
+        <button id="resetButton">リセットしてもう一度遊ぶ</button>
+    </div>
+
+    <script>
+        const board = document.getElementById('board');
+        const messageDisplay = document.getElementById('message');
+        const resetButton = document.getElementById('resetButton');
+        let gameBoard = ['', '', '', '', '', '', '', '', ''];
+        let isGameActive = true;
+        const player = 'X'; // プレイヤーは 'X' (〇)
+        const computer = 'O'; // コンピュータは 'O' (×)
+
+        const winningCombinations = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // 横
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // 縦
+            [0, 4, 8], [2, 4, 6]            // 斜め
+        ];
+
+        function createBoard() {
+            board.innerHTML = ''; // 既存のセルをクリア
+            gameBoard.forEach((cell, index) => {
+                const cellElement = document.createElement('div');
+                cellElement.classList.add('cell');
+                cellElement.dataset.index = index;
+                cellElement.addEventListener('click', () => handlePlayerClick(index));
+                board.appendChild(cellElement);
+            });
+            messageDisplay.textContent = 'あなたのターンです (〇)';
+            isGameActive = true;
+        }
+
+        function handlePlayerClick(index) {
+            if (gameBoard[index] === '' && isGameActive) {
+                // プレイヤーの手を反映
+                gameBoard[index] = player;
+                updateCell(index, player);
+
+                if (checkWin(player)) {
+                    messageDisplay.textContent = 'あなたの勝ちです！🎉';
+                    isGameActive = false;
+                    return;
+                }
+
+                if (checkDraw()) {
+                    messageDisplay.textContent = '引き分けです！';
+                    isGameActive = false;
+                    return;
+                }
+
+                // コンピュータのターン
+                messageDisplay.textContent = 'コンピュータの思考中...';
+                setTimeout(computerMove, 500); // 思考時間を与える
+            }
+        }
+
+        function computerMove() {
+            if (!isGameActive) return;
+
+            // シンプルなAIロジック: ランダムに空いているセルを選ぶ
+            let availableIndices = gameBoard.map((val, index) => val === '' ? index : -1).filter(index => index !== -1);
+            if (availableIndices.length > 0) {
+                const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+                gameBoard[randomIndex] = computer;
+                updateCell(randomIndex, computer);
+
+                if (checkWin(computer)) {
+                    messageDisplay.textContent = 'コンピュータの勝ちです...😢';
+                    isGameActive = false;
+                    return;
+                }
+
+                if (checkDraw()) {
+                    messageDisplay.textContent = '引き分けです！';
+                    isGameActive = false;
+                    return;
+                }
+
+                messageDisplay.textContent = 'あなたのターンです (〇)';
+            }
+        }
+
+        function updateCell(index, marker) {
+            const cellElement = board.querySelector(`[data-index="${index}"]`);
+            cellElement.textContent = marker === 'X' ? '〇' : '×';
+            cellElement.classList.add(marker);
+        }
+
+        function checkWin(marker) {
+            return winningCombinations.some(combination => {
+                return combination.every(index => {
+                    return gameBoard[index] === marker;
+                });
+            });
+        }
+
+        function checkDraw() {
+            return gameBoard.every(cell => cell !== '');
+        }
+
+        resetButton.addEventListener('click', () => {
+            gameBoard = ['', '', '', '', '', '', '', '', ''];
+            createBoard();
+        });
+
+        // 最初のボード作成
+        createBoard();
+    </script>
+</body>
+</html>

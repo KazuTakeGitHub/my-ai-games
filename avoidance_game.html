@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI作 障害物避けゲーム</title>
     <style>
-        /* 💡 修正点: 誤って挿入されていたボタンのHTMLを削除しました */
+        /* 修正済みのCSSをここに配置 */
         body { 
             font-family: sans-serif; 
             display: flex; 
@@ -35,7 +35,7 @@
         #message {
             font-size: 1.5em;
             font-weight: bold;
-            color: #dc3545; /* 赤 */
+            color: #dc3545;
             margin-top: 10px;
         }
         #startButton {
@@ -50,18 +50,18 @@
         }
         /* --- メニューボタンの汎用スタイル --- */
         #backToMenu {
-            position: fixed; /* 画面に固定 */
+            position: fixed;
             bottom: 20px;
             right: 20px;
             padding: 10px 15px;
             font-size: 1em;
             cursor: pointer;
-            background-color: #6c757d; /* グレー系 */
+            background-color: #6c757d;
             color: white;
             border: none;
             border-radius: 5px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            z-index: 1000; /* 他の要素より手前に表示 */
+            z-index: 1000;
             transition: background-color 0.2s;
         }
         #backToMenu:hover {
@@ -94,7 +94,7 @@
         const PLAYER_SPEED = 5;
         const OBSTACLE_SIZE = 25;
         const OBSTACLE_SPEED = 2;
-        const SPAWN_INTERVAL = 80; // 障害物生成間隔 (フレーム数)
+        const SPAWN_INTERVAL = 80;
 
         // --- ゲーム状態 ---
         let playerX = canvas.width / 2 - PLAYER_SIZE / 2;
@@ -105,7 +105,7 @@
         let leftPressed = false;
         let gameActive = false;
         let frameCount = 0;
-        let animationFrameId;
+        let animationFrameId; // アニメーションIDを定義
 
         // --- イベントリスナー ---
         document.addEventListener('keydown', keyDownHandler, false);
@@ -132,13 +132,13 @@
         function drawPlayer() {
             ctx.beginPath();
             ctx.rect(playerX, playerY, PLAYER_SIZE, PLAYER_SIZE);
-            ctx.fillStyle = '#007bff'; // 青
+            ctx.fillStyle = '#007bff';
             ctx.fill();
             ctx.closePath();
         }
 
         function drawObstacles() {
-            ctx.fillStyle = '#dc3545'; // 赤
+            ctx.fillStyle = '#dc3545';
             obstacles.forEach(obs => {
                 ctx.beginPath();
                 ctx.rect(obs.x, obs.y, OBSTACLE_SIZE, OBSTACLE_SIZE);
@@ -148,21 +148,18 @@
         }
 
         function spawnObstacle() {
-            // ランダムなX座標で障害物を生成
             const obsX = Math.random() * (canvas.width - OBSTACLE_SIZE);
             obstacles.push({ x: obsX, y: 0 });
         }
 
         // --- ゲームロジック ---
         function updateGame() {
-            // プレイヤーの移動
             if (rightPressed && playerX < canvas.width - PLAYER_SIZE) {
                 playerX += PLAYER_SPEED;
             } else if (leftPressed && playerX > 0) {
                 playerX -= PLAYER_SPEED;
             }
 
-            // 障害物の移動とスコア計算
             for (let i = obstacles.length - 1; i >= 0; i--) {
                 let obs = obstacles[i];
                 obs.y += OBSTACLE_SPEED;
@@ -178,7 +175,6 @@
                     return;
                 }
 
-                // 画面外に出たら削除
                 if (obs.y > canvas.height) {
                     obstacles.splice(i, 1);
                     score++;
@@ -186,7 +182,6 @@
                 }
             }
 
-            // 障害物の生成
             if (frameCount % SPAWN_INTERVAL === 0) {
                 spawnObstacle();
             }
@@ -197,7 +192,6 @@
         function draw() {
             if (!gameActive) return;
 
-            // 画面クリア
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             updateGame();
@@ -208,7 +202,6 @@
         }
 
         function startGame() {
-            // リセット
             if (animationFrameId) cancelAnimationFrame(animationFrameId);
             playerX = canvas.width / 2 - PLAYER_SIZE / 2;
             score = 0;
@@ -236,13 +229,13 @@
         ctx.textAlign = 'center';
         ctx.fillText('スタートボタンを押してください', canvas.width / 2, canvas.height / 2);
         
-        // 💡 修正点: メニューボタンのイベントリスナーを正しく記述し、閉じ括弧を修正しました。
+        // メニュー遷移ロジック
         const backToMenuButton = document.getElementById('backToMenu');
         backToMenuButton.addEventListener('click', () => {
             if (typeof cancelAnimationFrame !== 'undefined' && animationFrameId) {
-                cancelAnimationFrame(animationFrameId); // ゲームループ停止
+                cancelAnimationFrame(animationFrameId);
             }
-            window.location.href = 'index.html'; // メインメニューへ遷移
+            window.location.href = 'index.html';
         });
         
     </script>

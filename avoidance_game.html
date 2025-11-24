@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI作 障害物避けゲーム</title>
+    <style>
+        body { 
+            font-family: sans-serif; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            background-color: #f0f8ff; 
+            margin: 0;
+            padding: 20px;
+        }
+        .game-container {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        #myCanvas {
+            border: 2px solid #333;
+            background-color: #fafafa;
+            display: block;
+        }
+        #game-info {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        #message {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #dc3545; /* 赤 */
+            margin-top: 10px;
+        }
+        #startButton {
+            padding: 10px 20px;
+            font-size: 1.2em;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>AI作 障害物避けゲーム</h1>
+        <p>左右の矢印キーでプレイヤー（青いブロック）を動かして、上から落ちてくる赤いブロックを避け続けよう！</p>
+        <div id="game-info">
+            スコア: <span id="scoreDisplay">0</span>
+        </div>
+        <canvas id="myCanvas" width="400" height="400"></canvas>
+        <div id="message"></div>
+        <button id="startButton">スタート</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const messageDisplay = document.getElementById('message');
+        const startButton = document.getElementById('startButton');
+
+        // --- ゲーム定数 ---
+        const PLAYER_SIZE = 20;
+        const PLAYER_SPEED = 5;
+        const OBSTACLE_SIZE = 25;
+        const OBSTACLE_SPEED = 2;
+        const SPAWN_INTERVAL = 80; // 障害物生成間隔 (フレーム数)
+
+        // --- ゲーム状態 ---
+        let playerX = canvas.width / 2 - PLAYER_SIZE / 2;
+        let playerY = canvas.height - PLAYER_SIZE - 10;
+        let score = 0;
+        let obstacles = [];
+        let rightPressed = false;
+        let leftPressed = false;
+        let gameActive = false;
+        let frameCount = 0;
+        let animationFrameId;
+
+        // --- イベントリスナー ---
+        document.addEventListener('keydown', keyDownHandler, false);
+        document.addEventListener('keyup', keyUpHandler, false);
+        startButton.addEventListener('click', startGame, false);
+
+        function keyDownHandler(e) {
+            if (e.key === "Right" || e.key === "ArrowRight") {
+                rightPressed = true;
+            } else if (e.key === "Left" || e.key === "ArrowLeft") {
+                leftPressed = true;
+            }
+        }
+
+        function keyUpHandler(e) {
+            if (e.key === "Right" || e.key === "ArrowRight") {
+                rightPressed = false;
+            } else if (e.key === "Left" || e.key === "ArrowLeft") {
+                leftPressed = false;
+            }
+        }
+
+        // --- 描画関数 ---
+        function drawPlayer() {
+            ctx.beginPath();
+            ctx.rect(playerX, playerY, PLAYER_SIZE, PLAYER_SIZE);
+            ctx.fillStyle = '#007bff'; // 青
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function drawObstacles() {
+            ctx.fillStyle = '#dc3545'; // 赤
+            obstacles.forEach(obs => {
+                ctx.beginPath();
+                ctx.rect(obs.x, obs.y, OBSTACLE_SIZE, OBSTACLE_SIZE);
+                ctx.fill();
+                ctx.closePath();
+            });
+        }
+
+        function spawnObstacle() {
+            // ランダムなX座標で障害物を生成
+            const obsX = Math.random() * (canvas.width - OBSTACLE_SIZE);
+            obstacles.push({ x: obsX, y: 0 });
+        }
+
+        // --- ゲームロジック ---
+        function updateGame() {
+            // プレイヤーの移動
+            if (rightPressed && playerX < canvas.width - PLAYER_SIZE) {
+                playerX += PLAYER_SPEED;
+            } else if (leftPressed && playerX > 0) {
+                playerX -= PLAYER_SPEED;
+            }
+
+            // 障害物の移動とスコア計算
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                let obs = obstacles[i];
+                obs.y += OBSTACLE_SPEED;
+
+                // 衝突判定
+                if (
+                    playerX < obs.x + OBSTACLE_SIZE &&
+                    playerX + PLAYER_SIZE > obs.x &&
+                    playerY < obs.y + OBSTACLE_SIZE &&
+                    playerY + PLAYER_SIZE > obs.y
+                ) {
+                    gameOver();
+                    return;
+                }
+
+                // 画面外に出たら削除
+                if (obs.y > canvas.height) {
+                    obstacles.splice(i, 1);
+                    score++;
+                    scoreDisplay.textContent = score;
+                }
+            }
+
+            // 障害物の生成
+            if (frameCount % SPAWN_INTERVAL === 0) {
+                spawnObstacle();
+            }
+            frameCount++;
+        }
+
+        // --- メインゲームループ ---
+        function draw() {
+            if (!gameActive) return;
+
+            // 画面クリア
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            updateGame();
+            drawPlayer();
+            drawObstacles();
+
+            animationFrameId = requestAnimationFrame(draw);
+        }
+
+        function startGame() {
+            // リセット
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            playerX = canvas.width / 2 - PLAYER_SIZE / 2;
+            score = 0;
+            obstacles = [];
+            frameCount = 0;
+            scoreDisplay.textContent = score;
+            messageDisplay.textContent = '';
+            startButton.style.display = 'none';
+            gameActive = true;
+            
+            draw();
+        }
+
+        function gameOver() {
+            gameActive = false;
+            cancelAnimationFrame(animationFrameId);
+            messageDisplay.textContent = `ゲームオーバー！スコア: ${score} 点`;
+            startButton.textContent = 'もう一度プレイ';
+            startButton.style.display = 'block';
+        }
+        
+        // 初期表示
+        ctx.fillStyle = '#333';
+        ctx.font = '20px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('スタートボタンを押してください', canvas.width / 2, canvas.height / 2);
+
+    </script>
+</body>
+</html>

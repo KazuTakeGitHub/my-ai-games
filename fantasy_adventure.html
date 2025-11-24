@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI作 ファンタジーアドベンチャー</title>
+    <style>
+        body { 
+            font-family: 'Georgia', serif; 
+            background-color: #1e1e3f; /* 濃い夜空の色 */
+            color: #e0e0e0; /* 明るいテキスト */
+            display: flex; 
+            justify-content: center; 
+            padding: 30px; 
+            margin: 0;
+        }
+        .game-box {
+            background-color: #2b2b4d; /* ダークな背景 */
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(100, 100, 255, 0.5); /* 幻想的な光 */
+            max-width: 700px;
+            width: 100%;
+            border: 3px solid #6c6cff;
+        }
+        h1 {
+            color: #ffcc66; /* ゴールド */
+            border-bottom: 1px dashed #6c6cff;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+        #story-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            min-height: 150px;
+            white-space: pre-wrap; /* 改行を反映 */
+        }
+        #choices button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background-color: #6c6cff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        #choices button:hover {
+            background-color: #8a8aff;
+            transform: translateY(-2px);
+        }
+        #choices button:disabled {
+            background-color: #444;
+            cursor: not-allowed;
+        }
+        #resetButton {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-box">
+        <h1>🌌 運命の冒険 (Fantasy Adventure)</h1>
+        
+        <div id="story-text">物語がここに表示されます...</div>
+        
+        <div id="choices">
+            </div>
+        
+        <button id="resetButton" style="display: none;">最初からやり直す</button>
+    </div>
+
+    <script>
+        // ゲームのすべてのシーン（ノード）を定義します
+        const gameScenes = {
+            start: {
+                text: "あなたは古代の魔法に満ちた森の入り口で目を覚ました。周囲には濃い霧が立ち込め、遠くから獣の低い唸り声が聞こえる。足元には、輝く古い石版と、その脇に続く二つの道がある。",
+                choices: [
+                    { text: "1. 輝く石版に触れて、その力に頼る。", nextScene: "stone_power" },
+                    { text: "2. 石版を無視し、獣の唸り声のする方へ進む。", nextScene: "beast_path" }
+                ]
+            },
+            stone_power: {
+                text: "石版に触れると、冷たい電流が全身を走り抜け、あなたは一瞬意識を失った。\n\n目覚めると、あなたは世界が灰色に見えることに気づいた。そして、自分の内側に、強力だが制御不能な『闇の力』が宿っていることを知った。\n\n物語は終わる。",
+                choices: [{ text: "END: 闇の力と共に生きる", nextScene: "end_game" }]
+            },
+            beast_path: {
+                text: "唸り声のする方へ進むと、開けた場所に古い城塞が見えた。門は固く閉じられ、上空には巨大な影が旋回している。\n\n城塞に近づくか、それともこの場を離れるか？",
+                choices: [
+                    { text: "1. 城塞の門を叩き、誰かに助けを求める。", nextScene: "castle_gate" },
+                    { text: "2. 危険を避けて、元の森の入り口に戻る。", nextScene: "start" }
+                ]
+            },
+            castle_gate: {
+                text: "あなたが門を叩くと、門番ではなく、影の巨大な竜が着地した。\n\n竜は低く問いかける。「お前は何を求めてここへ来た？」",
+                choices: [
+                    { text: "1. 「平和な世界を求めてきた！」と叫ぶ。", nextScene: "end_dragon_quest" },
+                    { text: "2. 「失礼、道に迷った」と冷静に答える。", nextScene: "end_dragon_fail" }
+                ]
+            },
+            end_dragon_quest: {
+                text: "竜はあなたを嘲笑った後、「ふん、勇気だけはある」と言い、あなたを城塞の中へ連れ入れた。\n\nあなたは竜を味方につけ、新たな冒険が始まる。物語は終わる。",
+                choices: [{ text: "END: 竜と共に冒険へ", nextScene: "end_game" }]
+            },
+            end_dragon_fail: {
+                text: "竜は一瞬の沈黙の後、あなたに向かって炎を吐き出した。\n\nあなたは塵となった。物語は終わる。",
+                choices: [{ text: "END: 冒険失敗", nextScene: "end_game" }]
+            },
+            end_game: {
+                text: "物語はここで区切りをつけます。", // ここはダミーのシーン
+                choices: []
+            }
+        };
+
+        let currentScene = 'start';
+        const storyTextElement = document.getElementById('story-text');
+        const choicesElement = document.getElementById('choices');
+        const resetButton = document.getElementById('resetButton');
+
+        function updateScene() {
+            const scene = gameScenes[currentScene];
+            
+            // ストーリーテキストの更新
+            storyTextElement.textContent = scene.text;
+            
+            // 選択肢のボタンを生成
+            choicesElement.innerHTML = '';
+            
+            if (scene.choices.length > 0) {
+                scene.choices.forEach(choice => {
+                    const button = document.createElement('button');
+                    button.textContent = choice.text;
+                    button.addEventListener('click', () => makeChoice(choice.nextScene));
+                    choicesElement.appendChild(button);
+                });
+                resetButton.style.display = 'none';
+            } else {
+                // 選択肢がない（ゲーム終了）の場合
+                resetButton.style.display = 'block';
+            }
+        }
+
+        function makeChoice(nextSceneKey) {
+            currentScene = nextSceneKey;
+            
+            if (currentScene === 'end_game') {
+                // 選択肢を全て無効化
+                choicesElement.innerHTML = '';
+                resetButton.style.display = 'block';
+                return;
+            }
+            updateScene();
+        }
+
+        resetButton.addEventListener('click', () => {
+            currentScene = 'start';
+            updateScene();
+        });
+
+        // ゲーム開始
+        updateScene();
+
+    </script>
+</body>
+</html>

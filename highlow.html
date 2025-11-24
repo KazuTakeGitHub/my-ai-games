@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI作 数字当てゲーム</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+        }
+        .game-container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: fadeIn 1s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 2em;
+        }
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        input[type="number"] {
+            width: calc(100% - 20px);
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            font-size: 1.2em;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+        input[type="number"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        #message {
+            margin-top: 25px;
+            font-weight: bold;
+            font-size: 1.3em;
+            color: #28a745;
+        }
+        #guesses {
+            margin-top: 20px;
+            font-size: 1em;
+            color: #555;
+        }
+        .reset-button {
+            background-color: #6c757d;
+            margin-top: 20px;
+        }
+        .reset-button:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>AI作 数字当てゲーム</h1>
+        <p>1から100までの数字を当ててみよう！</p>
+        <p>チャンスは10回！</p>
+        <input type="number" id="guessInput" min="1" max="100" placeholder="数字を入力 (1-100)">
+        <button id="submitGuess">予想する</button>
+        <button id="resetButton" class="reset-button" style="display: none;">もう一度遊ぶ</button>
+        <p id="message"></p>
+        <p id="guesses">残り回数: <span id="remainingGuesses">10</span></p>
+        <p id="previousGuesses"></p>
+    </div>
+
+    <script>
+        let randomNumber = Math.floor(Math.random() * 100) + 1;
+        let guessCount = 0;
+        const maxGuesses = 10;
+        let previousGuesses = [];
+
+        const guessInput = document.getElementById('guessInput');
+        const submitButton = document.getElementById('submitGuess');
+        const resetButton = document.getElementById('resetButton');
+        const messageDisplay = document.getElementById('message');
+        const remainingGuessesDisplay = document.getElementById('remainingGuesses');
+        const previousGuessesDisplay = document.getElementById('previousGuesses');
+
+        submitButton.addEventListener('click', checkGuess);
+        resetButton.addEventListener('click', resetGame);
+
+        function checkGuess() {
+            const userGuess = Number(guessInput.value);
+
+            if (isNaN(userGuess) || userGuess < 1 || userGuess > 100) {
+                messageDisplay.textContent = '1から100の数字を入力してください。';
+                messageDisplay.style.color = '#dc3545'; // 赤色
+                return;
+            }
+
+            guessCount++;
+            previousGuesses.push(userGuess);
+            remainingGuessesDisplay.textContent = maxGuesses - guessCount;
+            previousGuessesDisplay.textContent = 'これまでの予想: ' + previousGuesses.join(', ');
+
+            if (userGuess === randomNumber) {
+                messageDisplay.textContent = `正解！おめでとう！${guessCount}回で当てました！`;
+                messageDisplay.style.color = '#28a745'; // 緑色
+                setGameOver();
+            } else if (guessCount >= maxGuesses) {
+                messageDisplay.textContent = `ゲームオーバー！残念、答えは ${randomNumber} でした。`;
+                messageDisplay.style.color = '#dc3545'; // 赤色
+                setGameOver();
+            } else {
+                if (userGuess < randomNumber) {
+                    messageDisplay.textContent = 'もっと大きい数字です！';
+                    messageDisplay.style.color = '#ffc107'; // 黄色
+                } else {
+                    messageDisplay.textContent = 'もっと小さい数字です！';
+                    messageDisplay.style.color = '#ffc107'; // 黄色
+                }
+            }
+            guessInput.value = ''; // 入力欄をクリア
+            guessInput.focus(); // 入力欄にフォーカス
+        }
+
+        function setGameOver() {
+            guessInput.disabled = true;
+            submitButton.disabled = true;
+            resetButton.style.display = 'block';
+        }
+
+        function resetGame() {
+            randomNumber = Math.floor(Math.random() * 100) + 1;
+            guessCount = 0;
+            previousGuesses = [];
+
+            guessInput.disabled = false;
+            submitButton.disabled = false;
+            resetButton.style.display = 'none';
+
+            messageDisplay.textContent = '';
+            messageDisplay.style.color = '#28a745'; // デフォルトに戻す
+            remainingGuessesDisplay.textContent = maxGuesses;
+            previousGuessesDisplay.textContent = '';
+
+            guessInput.value = '';
+            guessInput.focus();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI作 連打ゲーム</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #e0f2f7; /* 薄い水色 */
+            color: #333;
+            margin: 0;
+            flex-direction: column;
+        }
+        .game-container {
+            background-color: #ffffff;
+            padding: 30px 50px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            transform: scale(1);
+            transition: transform 0.2s ease-out;
+        }
+        .game-container.started {
+            transform: scale(1.02);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            color: #007bff; /* 青 */
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+        p {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        #clickButton {
+            background-color: #28a745; /* 緑 */
+            color: white;
+            padding: 20px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 2em;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            width: 80%;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+        #clickButton:hover:not(:disabled) {
+            background-color: #218838; /* 濃い緑 */
+            transform: translateY(-3px);
+        }
+        #clickButton:active:not(:disabled) {
+            transform: translateY(0);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+        }
+        #clickButton:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #countdown, #score {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #dc3545; /* 赤 */
+            margin: 15px 0;
+        }
+        #score {
+            color: #007bff; /* 青 */
+        }
+        #message {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 25px;
+            color: #343a40;
+        }
+        #startButton {
+            background-color: #007bff; /* 青 */
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 20px;
+        }
+        #startButton:hover {
+            background-color: #0056b3; /* 濃い青 */
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>AI作 連打ゲーム</h1>
+        <p>10秒間でどれだけボタンを連打できるかな？</p>
+        <button id="startButton">ゲームスタート</button>
+        <button id="clickButton" disabled style="display: none;">連打！</button>
+        <p>残り時間: <span id="countdown">10</span>秒</p>
+        <p>スコア: <span id="score">0</span></p>
+        <p id="message"></p>
+    </div>
+
+    <script>
+        const clickButton = document.getElementById('clickButton');
+        const startButton = document.getElementById('startButton');
+        const countdownDisplay = document.getElementById('countdown');
+        const scoreDisplay = document.getElementById('score');
+        const messageDisplay = document.getElementById('message');
+        const gameContainer = document.querySelector('.game-container');
+
+        const gameDuration = 10; // ゲーム時間（秒）
+        let score = 0;
+        let timeLeft = gameDuration;
+        let gameInterval;
+        let countdownInterval;
+
+        function startGame() {
+            score = 0;
+            timeLeft = gameDuration;
+            scoreDisplay.textContent = score;
+            countdownDisplay.textContent = timeLeft;
+            messageDisplay.textContent = '';
+            startButton.style.display = 'none';
+            clickButton.style.display = 'block';
+            clickButton.disabled = false;
+            gameContainer.classList.add('started');
+
+            // 1秒後にカウントダウンを開始
+            setTimeout(() => {
+                countdownInterval = setInterval(() => {
+                    timeLeft--;
+                    countdownDisplay.textContent = timeLeft;
+
+                    if (timeLeft <= 0) {
+                        clearInterval(countdownInterval);
+                        endGame();
+                    }
+                }, 1000);
+            }, 1000); // スタートボタンを押してから1秒後にカウントダウンを開始
+        }
+
+        function handleClick() {
+            score++;
+            scoreDisplay.textContent = score;
+        }
+
+        function endGame() {
+            clickButton.disabled = true;
+            clickButton.style.display = 'none';
+            messageDisplay.textContent = `ゲーム終了！あなたのスコアは ${score} 回でした！`;
+            startButton.style.display = 'block';
+            startButton.textContent = 'もう一度遊ぶ';
+            gameContainer.classList.remove('started');
+        }
+
+        startButton.addEventListener('click', startGame);
+        clickButton.addEventListener('click', handleClick);
+    </script>
+</body>
+</html>

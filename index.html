@@ -3,73 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini作ミニゲームリンク集</title>
+    <title>AI Co-Creation Game Hub | Gemini 🎮</title>
     <style>
-        /* 見やすいようにシンプルなCSSを追記しました */
-        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f9; }
-        h1 { color: #0056b3; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
-        h2 { color: #333; margin-top: 30px; border-left: 5px solid #007bff; padding-left: 10px; }
+        /* --- 令和風デザインのCSS --- */
+        body { 
+            font-family: 'Hiragino Sans', 'Meiryo', sans-serif;
+            padding: 20px 10px;
+            background-color: #f8f9fa; /* クリーンな背景色 */
+            color: #343a40;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 { 
+            color: #1e3a8a; /* 落ち着いたネイビー */
+            border-bottom: 3px solid #a2d2ff; /* 淡いブルーのアクセント */
+            padding-bottom: 15px;
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 25px;
+        }
+        .intro-box {
+            background-color: #e0f7fa; /* 爽やかなパステルカラー */
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        h2 { 
+            color: #4a5568; /* グレー系のサブカラー */
+            margin-top: 30px; 
+            padding-left: 10px; 
+            border-left: 5px solid #a2d2ff; /* アクセントカラー */
+            font-size: 1.5em;
+        }
         ul { list-style: none; padding: 0; }
-        li { background-color: #fff; margin-bottom: 15px; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        li a { font-size: 1.3em; font-weight: bold; color: #007bff; text-decoration: none; display: block; margin-bottom: 5px; }
-        li p { font-size: 0.9em; color: #666; margin: 0; padding-top: 5px; border-top: 1px dashed #eee; }
+        
+        /* カードデザイン */
+        li { 
+            background-color: #ffffff;
+            margin-bottom: 12px;
+            padding: 15px 20px;
+            border-radius: 12px; /* 丸みのあるデザイン */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* 控えめなシャドウ */
+            transition: transform 0.2s;
+        }
+        li:hover {
+            transform: translateY(-3px); /* ホバーで少し浮き上がる */
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        li a { 
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #007bff;
+            text-decoration: none;
+            display: block; 
+            margin-bottom: 5px; 
+        }
+        li p { 
+            font-size: 0.9em; 
+            color: #6c757d; /* 読みやすいグレー */
+            margin: 0; 
+            padding-top: 5px; 
+            border-top: 1px dashed #e9ecef; 
+        }
     </style>
 </head>
 <body>
-    <h1>🤖 Gemini作ミニゲームリンク集 (全5種類)</h1>
-    <p>AI (Gemini) に指示して作成したミニゲームコレクションです。プロンプト（指示内容）も一緒に公開しています。</p>
+    <div class="container">
+        <h1>🤖 Gemini Co-Creation Game Hub</h1>
+        
+        <div class="intro-box">
+            <p><strong>ようこそ！現在、全8種類のミニゲームを公開中です。</strong><br>
+            これらのゲームは、私、AI (Gemini) のコード生成能力と、あなたのアイデアによって生まれました。</p>
+        </div>
 
-    <h2>🎮 アクション・反射系</h2>
-    <ul>
-        <li>
-            <a href="breakout.html">シンプルなブロック崩し</a>
-            <p>【AIへの指示】HTMLとJavaScriptでシンプルなブロック崩しゲームを作って。キーボードとマウスで操作できるようにしてね。</p>
-        </li>
-        <li>
-            <a href="clicker.html">連打ゲーム</a>
-            <p>【AIへの指示】10秒間でボタンを連打するゲームをHTMLとJavaScriptで作成して。スコアを表示して、時間切れで終了するようにしてね。</p>
-        </li>
-        <li>
-        <a href="avoidance_game.html">障害物避けゲーム (アクション)</a>
-        <p>【AIへの指示】CanvasとJavaScriptで、上から落ちてくるブロックを避けるシンプルなアクションゲームを作成して。左右キーで操作できるようにしてね。</p>
-    </li>
-    </ul>
-
-    <h2>🧠 ロジック・対戦系</h2>
-    <ul>
-        <li>
-            <a href="tictactoe.html">〇×ゲーム (三目並べ)</a>
-            <p>【AIへの指示】HTMLとJavaScriptで〇×ゲーム（三目並べ）を作って。プレイヤーは〇、コンピュータは×で、対戦できるように簡単なAIを実装して。</p>
-        </li>
-        <li>
-            <a href="janken.html">じゃんけんゲーム</a>
-            <p>【AIへの指示】コンピュータと対戦するじゃんけんゲーム（グー・チョキ・パー）をHTMLとJavaScriptで作成して。勝敗のスコアも記録するようにしてね。</p>
-        </li>
-        <li>
-            <a href="highlow.html">数字当てゲーム (High & Low)</a>
-            <p>【AIへの指示】1～100の数字を当てるHigh & LowゲームをHTMLとJavaScriptで作って。回数制限を10回にして、答えがHighかLowか教えてね。</p>
-        </li>
-    </ul>
-    <h2>📖 物語・アドベンチャー系</h2>
-    <ul>
-        <li>
-            <a href="fantasy_adventure.html">運命の冒険 (テキストアドベンチャー)</a>
-            <p>【AIへの指示】ファンタジー設定で選択肢によって物語が分岐するアドベンチャーゲームをHTMLとJavaScriptで作成して。</p>
-        </li>
+        <h2>🕹️ アクション・反射系 (Action/Reflex)</h2>
+        <ul>
             <li>
-        <a href="scifi_adventure.html">デブリ・ステーションの覚醒 (SFアドベンチャー)</a>
-        <p>【AIへの指示】無人の宇宙ステーションからの脱出をテーマにしたSFテキストアドベンチャーをHTMLとJavaScriptで作成して。</p>
-    </li>
-    </ul>
+                <a href="avoidance_game.html">障害物避けゲーム (NEW!)</a>
+                <p>【AIへの指示】Canvasで、上から落ちてくるブロックを避けるシンプルなアクションゲームを作成して。</p>
+            </li>
+            <li>
+                <a href="breakout.html">シンプルなブロック崩し</a>
+                <p>【AIへの指示】HTMLとJavaScriptでシンプルなブロック崩しゲームを作って。キーボードとマウスで操作できるようにしてね。</p>
+            </li>
+            <li>
+                <a href="clicker.html">連打ゲーム</a>
+                <p>【AIへの指示】10秒間でボタンを連打するゲームをHTMLとJavaScriptで作成して。スコアを表示してね。</p>
+            </li>
+        </ul>
+        
+        <hr>
 
+        <h2>🧠 ロジック・対戦系 (Logic/Competitive)</h2>
+        <ul>
+            <li>
+                <a href="tictactoe.html">〇×ゲーム (三目並べ)</a>
+                <p>【AIへの指示】HTMLとJavaScriptで〇×ゲームを作って。簡単なAIを実装して対戦できるようにしてね。</p>
+            </li>
+            <li>
+                <a href="janken.html">じゃんけんゲーム</a>
+                <p>【AIへの指示】コンピュータと対戦するじゃんけんゲームを作成して。勝敗のスコアも記録するようにしてね。</p>
+            </li>
+            <li>
+                <a href="highlow.html">数字当てゲーム (High & Low)</a>
+                <p>【AIへの指示】1～100の数字を当てるHigh & LowゲームをHTMLとJavaScriptで作って。回数制限を10回にしてね。</p>
+            </li>
+        </ul>
 
+        <hr>
 
-    
-    <hr>
-    <p>このサイトはGeminiと共作し、GitHub Pagesで公開されています。</p>
+        <h2>📜 物語・アドベンチャー系 (Narrative/Adventure)</h2>
+        <ul>
+            <li>
+                <a href="fantasy_adventure.html">運命の冒険 (ファンタジー)</a>
+                <p>【AIへの指示】ファンタジー設定で選択肢によって物語が分岐するアドベンチャーゲームを作成して。</p>
+            </li>
+            <li>
+                <a href="scifi_adventure.html">デブリ・ステーションの覚醒 (SF)</a>
+                <p>【AIへの指示】無人の宇宙ステーションからの脱出をテーマにしたSFテキストアドベンチャーを作成して。</p>
+            </li>
+        </ul>
+    </div>
 </body>
 </html>
-
-
-
-

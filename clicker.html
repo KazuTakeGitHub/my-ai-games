@@ -95,6 +95,25 @@
         #startButton:hover {
             background-color: #0056b3; /* 濃い青 */
         }
+        /* --- メニューボタンの汎用スタイル (追加) --- */
+        #backToMenu {
+            position: fixed; /* 画面に固定 */
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: #6c757d; /* グレー系 */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: background-color 0.2s;
+        }
+        #backToMenu:hover {
+            background-color: #5a6268;
+        }
     </style>
 </head>
 <body>
@@ -108,6 +127,8 @@
         <p id="message"></p>
     </div>
 
+    <button id="backToMenu">🏡 メインメニューに戻る</button> 
+
     <script>
         const clickButton = document.getElementById('clickButton');
         const startButton = document.getElementById('startButton');
@@ -115,12 +136,13 @@
         const scoreDisplay = document.getElementById('score');
         const messageDisplay = document.getElementById('message');
         const gameContainer = document.querySelector('.game-container');
+        const backToMenuButton = document.getElementById('backToMenu'); // メニューボタンを取得
 
         const gameDuration = 10; // ゲーム時間（秒）
         let score = 0;
         let timeLeft = gameDuration;
-        let gameInterval;
-        let countdownInterval;
+        // let gameInterval; // 不要な変数。ゲームタイマーはcountdownIntervalのみで管理する
+        let countdownInterval; // タイマーIDを保持
 
         function startGame() {
             score = 0;
@@ -163,6 +185,17 @@
 
         startButton.addEventListener('click', startGame);
         clickButton.addEventListener('click', handleClick);
+
+        // --- メニュー遷移ロジックの追加 ---
+        backToMenuButton.addEventListener('click', () => {
+            // ゲームタイマーが動いている場合、停止させる
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            // メインメニューへ遷移
+            window.location.href = 'index.html'; 
+        });
+        
     </script>
 </body>
 </html>

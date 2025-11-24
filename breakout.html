@@ -22,6 +22,26 @@
             font-size: 24px;
             margin-bottom: 20px;
         }
+
+        /* --- メニューボタンの汎用スタイル (追加) --- */
+        #backToMenu {
+            position: fixed; /* 画面に固定 */
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: #6c757d; /* グレー系 */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: background-color 0.2s;
+        }
+        #backToMenu:hover {
+            background-color: #5a6268;
+        }
     </style>
 </head>
 <body>
@@ -32,11 +52,14 @@
         <canvas id="myCanvas" width="480" height="320"></canvas>
     </div>
 
+    <button id="backToMenu">🏡 メインメニューに戻る</button> 
+
     <script>
         const canvas = document.getElementById("myCanvas");
         const ctx = canvas.getContext("2d");
         const startButton = document.getElementById("startButton");
         const messageDisplay = document.getElementById("message");
+        const backToMenuButton = document.getElementById("backToMenu"); // ボタン要素を取得
 
         let ballRadius = 10;
         let x = canvas.width / 2;
@@ -62,6 +85,7 @@
         let score = 0;
         let lives = 3;
         let gameStarted = false;
+        let animationFrameId; // アニメーションIDを保持する変数を定義
 
         let bricks = [];
         function createBricks() {
@@ -79,6 +103,16 @@
         document.addEventListener("keyup", keyUpHandler, false);
         document.addEventListener("mousemove", mouseMoveHandler, false);
         startButton.addEventListener("click", startGame, false);
+        
+        // メニューボタンのイベントリスナーを追加
+        backToMenuButton.addEventListener('click', () => {
+            // アニメーションループを停止
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            // メインメニューへ遷移
+            window.location.href = 'index.html'; 
+        });
 
         function keyDownHandler(e) {
             if (!gameStarted) return;
@@ -120,6 +154,10 @@
                             if (score === brickRowCount * brickColumnCount) {
                                 messageDisplay.textContent = "おめでとう！全ブロック破壊！";
                                 gameStarted = false;
+                                
+                                // アニメーションループを停止 (ゲームクリア時)
+                                if (animationFrameId) cancelAnimationFrame(animationFrameId); 
+
                                 startButton.style.display = 'block';
                                 startButton.textContent = 'もう一度プレイ';
                                 return;
@@ -201,6 +239,10 @@
                     if (!lives) {
                         messageDisplay.textContent = "ゲームオーバー！スコア: " + score;
                         gameStarted = false;
+
+                        // アニメーションループを停止 (ゲームオーバー時)
+                        if (animationFrameId) cancelAnimationFrame(animationFrameId); 
+
                         startButton.style.display = 'block';
                         startButton.textContent = 'もう一度プレイ';
                     } else {
@@ -224,7 +266,7 @@
             x += dx;
             y += dy;
 
-            requestAnimationFrame(draw);
+            animationFrameId = requestAnimationFrame(draw); // IDを保持
         }
 
         function startGame() {
@@ -242,17 +284,5 @@
             draw();
         }
     </script>
-    // --- Canvasゲーム用のメニュー遷移ロジック ---
-        const backToMenuButton = document.getElementById('backToMenu');
-        backToMenuButton.addEventListener('click', () => {
-            // ① アニメーションループを停止
-            if (typeof cancelAnimationFrame !== 'undefined' && animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
-            }
-            // ② index.htmlへ遷移
-            window.location.href = 'index.html'; 
-        });
-        // ------------------------------------------
 </body>
-
 </html>

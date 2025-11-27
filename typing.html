@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI作 タイピングゲーム</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            transition: background-color 0.5s ease; /* 背景色変更のトランジション */
+        }
+        .game-container {
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 800px;
+            width: 90%;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #1a73e8;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+        #targetText {
+            font-size: 2em;
+            line-height: 1.5;
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            min-height: 60px;
+            user-select: none;
+            white-space: pre-wrap; /* テキストの折り返しを維持 */
+        }
+        .correct {
+            color: #28a745; /* 正確に入力された文字 */
+            font-weight: bold;
+        }
+        .incorrect {
+            background-color: #dc3545; /* ミスした文字の背景 */
+            color: white;
+            border-radius: 3px;
+            padding: 2px 0;
+            font-weight: bold;
+            animation: shake 0.1s; /* 振動エフェクト */
+        }
+        .current {
+            background-color: #ffc107; /* 次に入力すべき文字 */
+            color: #333;
+            padding: 2px 0;
+            border-radius: 3px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        
+        #inputArea {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.5em;
+            border: 2px solid #1a73e8;
+            border-radius: 8px;
+            text-align: center;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        #inputArea:focus {
+            border-color: #0056b3;
+        }
+
+        #result {
+            margin-top: 30px;
+            font-size: 1.5em;
+            color: #1a73e8;
+            font-weight: bold;
+        }
+        .stat {
+            margin: 10px 0;
+            font-size: 1.1em;
+            text-align: left;
+            padding-left: 20px;
+        }
+        
+        #startButton, #resetButton {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            margin-top: 20px;
+        }
+        #startButton:hover, #resetButton:hover {
+            background-color: #1e7e34;
+            transform: translateY(-2px);
+        }
+
+        /* --- メニューボタンの汎用スタイル --- */
+        #backToMenu {
+            position: fixed; 
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: background-color 0.2s;
+        }
+        #backToMenu:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>AI作 タイピングゲーム 🚀</h1>
+        <p>以下のテキストを時間内に正確に入力してください。</p>
+        
+        <div id="targetText">
+            </div>
+        
+        <input type="text" id="inputArea" placeholder="スタートボタンを押して開始" disabled>
+        
+        <p id="time">残り時間: 60秒</p>
+        
+        <button id="startButton">スタート！</button>
+        <button id="resetButton" style="display: none;">もう一度！</button>
+
+        <div id="result" style="display: none;">
+            </div>
+    </div>
+
+    <button id="backToMenu">🏡 メインメニューに戻る</button>
+
+    <script>
+        // --- 設定と変数 ---
+        const texts = [
+            "プログラミングは楽しい",
+            "JavaScriptでゲーム開発",
+            "コードを書くのが好きです",
+            "クオリティアップを目指す",
+            "AIによるゲーム開発キット",
+            "全てのゲームを最高に仕上げる",
+            "メインメニューに戻るボタンの追加が完了",
+            "次の改善ステップに進む準備完了",
+            "正確なタイピングは基本スキル",
+            "ウェブ開発の世界へようこそ"
+        ];
+        
+        let currentTextIndex = 0;
+        let originalText = '';
+        let timer = null;
+        let timeLeft = 60; // 制限時間（秒）
+        let isGameActive = false;
+        let totalTimeSpent = 0;
+        let totalTypedChars = 0;
+        let totalErrors = 0;
+        let startTime = 0;
+
+        // --- DOM要素の取得 ---
+        const targetTextElement = document.getElementById('targetText');
+        const inputArea = document.getElementById('inputArea');
+        const timeDisplay = document.getElementById('time');
+        const startButton = document.getElementById('startButton');
+        const resetButton = document.getElementById('resetButton');
+        const resultDisplay = document.getElementById('result');
+        const backToMenuButton = document.getElementById('backToMenu');
+
+        // --- イベントリスナー ---
+        startButton.addEventListener('click', startGame);
+        resetButton.addEventListener('click', resetGame);
+        inputArea.addEventListener('input', handleInput);
+        backToMenuButton.addEventListener('click', () => {
+            clearInterval(timer); // タイマーを停止
+            window.location.href = 'index.html';
+        });
+
+        // --- 初期設定 ---
+        initializeGame();
+
+        function initializeGame() {
+            // ゲーム開始前の初期状態を設定
+            currentTextIndex = 0;
+            totalTypedChars = 0;
+            totalErrors = 0;
+            originalText = texts[currentTextIndex];
+            renderText();
+            inputArea.value = '';
+            inputArea.disabled = true;
+            startButton.style.display = 'block';
+            resetButton.style.display = 'none';
+            resultDisplay.style.display = 'none';
+            timeDisplay.textContent = `残り時間: ${timeLeft}秒`;
+            document.body.style.backgroundColor = '#f4f7f6'; // 背景色をリセット
+        }
+
+        function renderText() {
+            // 現在のテキストをHTMLで整形して表示
+            targetTextElement.innerHTML = originalText.split('').map((char, index) => {
+                let cls = '';
+                if (index < inputArea.value.length) {
+                    // 既に入力された文字
+                    cls = originalText[index] === inputArea.value[index] ? 'correct' : 'incorrect';
+                } else if (index === inputArea.value.length) {
+                    // 次に入力すべき文字
+                    cls = 'current';
+                }
+                return `<span class="${cls}">${char}</span>`;
+            }).join('');
+        }
+
+        function startGame() {
+            if (isGameActive) return;
+
+            isGameActive = true;
+            inputArea.disabled = false;
+            startButton.style.display = 'none';
+            inputArea.focus();
+            
+            startTime = Date.now();
+            totalTimeSpent = 0;
+
+            timer = setInterval(() => {
+                timeLeft--;
+                timeDisplay.textContent = `残り時間: ${timeLeft}秒`;
+                
+                // 時間経過に応じて背景色を警告色に近づける (視覚的フィードバック)
+                const ratio = (60 - timeLeft) / 60;
+                const r = Math.floor(244 + (220 - 244) * ratio); // f4 -> dc
+                const g = Math.floor(247 + (220 - 247) * ratio); // f7 -> dc
+                const b = Math.floor(246 + (220 - 246) * ratio); // f6 -> dc
+                document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+
+                if (timeLeft <= 0) {
+                    endGame(false); // タイムアップ
+                }
+            }, 1000);
+        }
+
+        function handleInput(event) {
+            if (!isGameActive) return;
+
+            const typedText = inputArea.value;
+            const targetLength = originalText.length;
+            const lastTypedChar = typedText.slice(-1);
+            const targetChar = originalText[typedText.length - 1];
+
+            // 入力文字数が増えた場合のみエラーチェック
+            if (typedText.length > totalTypedChars) {
+                totalTypedChars++;
+                if (lastTypedChar !== targetChar) {
+                    totalErrors++;
+                    // ミス時にbodyにシェイクアニメーションを適用 (視覚的フィードバック)
+                    document.body.classList.add('shake-on-error');
+                    setTimeout(() => document.body.classList.remove('shake-on-error'), 100);
+                }
+            } else if (typedText.length < totalTypedChars) {
+                // 文字が削除された場合
+                totalTypedChars = typedText.length;
+            }
+
+
+            renderText();
+
+            // 正しく入力し終わったかチェック
+            if (typedText === originalText) {
+                currentTextIndex++;
+                if (currentTextIndex < texts.length) {
+                    // 次のテキストへ
+                    inputArea.value = '';
+                    originalText = texts[currentTextIndex];
+                    renderText();
+                } else {
+                    // 全てのテキストを完了
+                    endGame(true);
+                }
+            }
+        }
+
+        function endGame(success) {
+            isGameActive = false;
+            clearInterval(timer);
+            totalTimeSpent = (Date.now() - startTime) / 1000;
+            inputArea.disabled = true;
+
+            const totalChars = texts.join('').length;
+            const wpm = success ? Math.floor(totalChars / 5 / totalTimeSpent * 60) : 0;
+            const accuracy = success ? (1 - (totalErrors / totalChars)) * 100 : 0;
+            
+            // 結果表示の整形
+            resultDisplay.innerHTML = `
+                <h2>${success ? '🎉 完了！おめでとうございます！ 🎉' : '⏰ タイムアップ！'}</h2>
+                <div class="stat">総文字数: ${totalChars} 文字</div>
+                <div class="stat">入力時間: ${totalTimeSpent.toFixed(2)} 秒</div>
+                <div class="stat">誤入力回数: ${totalErrors} 回</div>
+                <hr>
+                <div class="stat" style="font-size:1.4em;">🎯 精度 (Accuracy): ${accuracy.toFixed(2)}%</div>
+                <div class="stat" style="font-size:1.4em;">🚀 WPM (一分間の単語数): ${wpm}</div>
+            `;
+            
+            resultDisplay.style.display = 'block';
+            resetButton.style.display = 'block';
+            document.body.style.backgroundColor = success ? '#e6ffe6' : '#ffe6e6'; // 成功/失敗で背景色を明確に変化
+        }
+
+        function resetGame() {
+            timeLeft = 60;
+            initializeGame();
+        }
+    </script>
+</body>
+</html>
